@@ -1,0 +1,265 @@
+<!doctype html>
+
+<html lang="ur">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>My Videos</title>  <style>
+    body {
+      font-family: sans-serif;
+      margin: 0;
+      background: #0b1220;
+      color: #f1f5f9;
+    }
+    header {
+      background: #1e293b;
+      padding: 12px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      flex-wrap: wrap;
+    }
+    header h1 {
+      font-size: 20px;
+      margin: 0;
+    }
+    nav button {
+      background: #334155;
+      border: none;
+      color: #f1f5f9;
+      padding: 6px 14px;
+      margin: 4px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    nav button.active {
+      background: #2563eb;
+    }
+    .gallery {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 16px;
+      padding: 20px;
+    }
+    .card {
+      background: #1e293b;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 18px rgba(0,0,0,0.5);
+      display: flex;
+      flex-direction: column;
+    }
+    .thumb {
+      position: relative;
+      width: 100%;
+      padding-top: 56.25%; /* 16:9 */
+      background: #000;
+    }
+    .thumb video {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      pointer-events: none;
+    }
+    .card h3 {
+      margin: 0;
+      font-size: 14px;
+      font-weight: 600;
+      padding: 10px;
+    }
+    .player {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.85);
+      z-index: 2000;
+      justify-content: center;
+      align-items: center;
+    }
+    .player video {
+      max-width: 90%;
+      max-height: 80%;
+      border-radius: 12px;
+      background: #000;
+    }
+    .closeBtn {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: #dc2626;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      font-size: 20px;
+      cursor: pointer;
+    }
+    .pagination {
+      display: flex;
+      justify-content: center;
+      padding: 20px;
+      gap: 10px;
+    }
+    .pagination button {
+      background: #334155;
+      border: none;
+      color: #f1f5f9;
+      padding: 6px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    .pagination button:disabled {
+      background: #475569;
+      cursor: not-allowed;
+    }
+    /* Ad Overlay */
+    #adOverlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.9);
+      color: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      z-index: 5000;
+    }
+    #skipBtn {
+      margin-top: 20px;
+      padding: 10px 20px;
+      background: #2563eb;
+      border: none;
+      border-radius: 6px;
+      color: #fff;
+      font-weight: bold;
+      cursor: pointer;
+      display: none;
+    }
+    #timer {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      font-size: 18px;
+      font-weight: bold;
+      background: rgba(0,0,0,0.6);
+      padding: 6px 12px;
+      border-radius: 6px;
+    }
+  </style></head>
+<body>
+  <!-- Ad Overlay -->
+  <div id="adOverlay">
+    <div id="timer">15</div>
+    <iframe id="adFrame" src="" style="width:80%;height:60%;border:none;border-radius:8px;"></iframe>
+    <button id="skipBtn">Skip Ad</button>
+  </div>  <header>
+    <h1>📺 My Videos</h1>
+    <nav>
+      <button class="active" onclick="filterCategory('all')">Home</button>
+      <button onclick="filterCategory('category1')">Category 1</button>
+      <button onclick="filterCategory('category2')">Category 2</button>
+      <button onclick="filterCategory('category3')">Category 3</button>
+      <button onclick="filterCategory('category4')">Category 4</button>
+      <button onclick="filterCategory('category5')">Category 5</button>
+    </nav>
+  </header>  <main class="gallery" id="videoGallery">
+    <div class="card" data-category="category1">
+      <div class="thumb" onclick="openPlayer('https://datavideo.sfo3.cdn.digitaloceanspaces.com/Boys%20Video/VID-20240525-WA0429.mp4')">
+        <video src="https://datavideo.sfo3.cdn.digitaloceanspaces.com/Boys%20Video/VID-20240525-WA0429.mp4#t=1" muted></video>
+      </div>
+      <h3>Video 1</h3>
+    </div><div class="card" data-category="category2">
+  <div class="thumb" onclick="openPlayer('https://datavideo.sfo3.cdn.digitaloceanspaces.com/Boys%20Video/2024-01-07%2011.50.22.mov')">
+    <video src="https://datavideo.sfo3.cdn.digitaloceanspaces.com/Boys%20Video/2024-01-07%2011.50.22.mov#t=1" muted></video>
+  </div>
+  <h3>Video 2</h3>
+</div>
+
+  </main>  <div class="pagination">
+    <button id="prevBtn" onclick="changePage(-1)">Previous</button>
+    <button id="nextBtn" onclick="changePage(1)">Next</button>
+  </div>  <div class="player" id="player">
+    <button class="closeBtn" onclick="closePlayer()">×</button>
+    <video id="playerVideo" controls playsinline></video>
+  </div>  <script>
+    // Ads کے لنکس
+    const adLinks = [
+      "https://www.revenuecpmgate.com/b7gn1rctv?key=a6df49ee2755a88078fad4af6ebd06bf",
+      "https://www.revenuecpmgate.com/ht895npk?key=1dfeb60a3b20c38bc592436e3ccf9a82",
+      "https://www.revenuecpmgate.com/dqm7ya0myx?key=976aa4962ea641f87639dfc784b35969",
+      "https://www.revenuecpmgate.com/zq5rzngg?key=a6fd58330a330c83ef94c1f7b6534856"
+    ];
+
+    const randomAd = adLinks[Math.floor(Math.random() * adLinks.length)];
+    const adFrame = document.getElementById('adFrame');
+    const adOverlay = document.getElementById('adOverlay');
+    const timerEl = document.getElementById('timer');
+    const skipBtn = document.getElementById('skipBtn');
+
+    let timeLeft =15;
+    adFrame.src = randomAd;
+
+    const countdown = setInterval(() => {
+      timeLeft--;
+      timerEl.textContent = timeLeft;
+      if (timeLeft <= 3) {
+        skipBtn.style.display = 'block';
+      }
+      if (timeLeft <= 0) {
+        clearInterval(countdown);
+        adOverlay.style.display = 'none';
+      }
+    }, 1000);
+
+    skipBtn.addEventListener('click', () => {
+      clearInterval(countdown);
+      adOverlay.style.display = 'none';
+    });
+
+    const player = document.getElementById('player');
+    const playerVideo = document.getElementById('playerVideo');
+
+    function openPlayer(src) {
+      player.style.display = 'flex';
+      playerVideo.src = src;
+      playerVideo.play();
+    }
+
+    function closePlayer() {
+      playerVideo.pause();
+      playerVideo.src = '';
+      player.style.display = 'none';
+    }
+
+    function filterCategory(cat) {
+      document.querySelectorAll('nav button').forEach(btn => btn.classList.remove('active'));
+      event.target.classList.add('active');
+      document.querySelectorAll('.gallery .card').forEach(card => {
+        if (cat === 'all' || card.dataset.category === cat) {
+          card.style.display = 'flex';
+        } else {
+          card.style.display = 'none';
+        }
+      });
+    }
+
+    playerVideo.addEventListener('play', () => {
+      document.querySelectorAll('.gallery video').forEach(v => v.pause());
+    });
+
+    let currentPage = 1;
+    const itemsPerPage = 50;
+    function changePage(step) {
+      currentPage += step;
+      alert("Page changed: " + currentPage);
+    }
+  </script></body>
+</html>
