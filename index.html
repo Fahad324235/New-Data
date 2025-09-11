@@ -1,10 +1,10 @@
 <!doctype html>
-
-<html lang="ur">
+<html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>My Videos</title>  <style>
+  <title>Data</title>
+  <style>
     body {
       font-family: sans-serif;
       margin: 0;
@@ -58,6 +58,7 @@
       width: 100%;
       padding-top: 56.25%; /* 16:9 */
       background: #000;
+      cursor: pointer;
     }
     .thumb video {
       position: absolute;
@@ -67,12 +68,6 @@
       object-fit: cover;
       pointer-events: none;
     }
-    .card h3 {
-      margin: 0;
-      font-size: 14px;
-      font-weight: 600;
-      padding: 10px;
-    }
     .player {
       display: none;
       position: fixed;
@@ -81,6 +76,7 @@
       z-index: 2000;
       justify-content: center;
       align-items: center;
+      flex-direction: column;
     }
     .player video {
       max-width: 90%;
@@ -153,58 +149,55 @@
       padding: 6px 12px;
       border-radius: 6px;
     }
-  </style></head>
+  </style>
+</head>
 <body>
   <!-- Ad Overlay -->
   <div id="adOverlay">
     <div id="timer">15</div>
     <iframe id="adFrame" src="" style="width:80%;height:60%;border:none;border-radius:8px;"></iframe>
     <button id="skipBtn">Skip Ad</button>
-  </div>  <header>
-    <h1>📺 My Videos</h1>
-    <nav>
-      <button class="active" onclick="filterCategory('all')">Home</button>
-      <button onclick="filterCategory('category1')">Category 1</button>
-      <button onclick="filterCategory('category2')">Category 2</button>
-      <button onclick="filterCategory('category3')">Category 3</button>
-      <button onclick="filterCategory('category4')">Category 4</button>
-      <button onclick="filterCategory('category5')">Category 5</button>
-    </nav>
-  </header>  <main class="gallery" id="videoGallery">
-    <div class="card" data-category="category1">
-      <div class="thumb" onclick="openPlayer('https://datavideo.sfo3.cdn.digitaloceanspaces.com/Boys%20Video/VID-20240525-WA0429.mp4')">
-        <video src="https://datavideo.sfo3.cdn.digitaloceanspaces.com/Boys%20Video/VID-20240525-WA0429.mp4#t=1" muted></video>
-      </div>
-      
-    </div><div class="card" data-category="category2">
-  <div class="thumb" onclick="openPlayer('https://datavideo.sfo3.cdn.digitaloceanspaces.com/Boys%20Video/2024-01-07%2011.50.22.mov')">
-    <video src="https://datavideo.sfo3.cdn.digitaloceanspaces.com/Boys%20Video/2024-01-07%2011.50.22.mov#t=1" muted></video>
   </div>
 
-</div>
+  <header>
+    <h1>📺 Data 2025</h1>
+    <nav>
+      <button class="active" onclick="filterCategory('all', this)">Home</button>
+      <button onclick="filterCategory('boys', this)">Boys</button>
+      <button onclick="filterCategory('girls', this)">Girls</button>
+      <button onclick="filterCategory('funny', this)">Funny</button>
+      <button onclick="filterCategory('islamic', this)">Islamic</button>
+      <button onclick="filterCategory('others', this)">Others</button>
+    </nav>
+  </header>
 
-  </main>  <div class="pagination">
+  <main class="gallery" id="videoGallery"></main>
+
+  <div class="pagination">
     <button id="prevBtn" onclick="changePage(-1)">Previous</button>
     <button id="nextBtn" onclick="changePage(1)">Next</button>
-  </div>  <div class="player" id="player">
+  </div>
+
+  <div class="player" id="player">
     <button class="closeBtn" onclick="closePlayer()">×</button>
     <video id="playerVideo" controls playsinline></video>
-  </div>  <script>
-    // Ads کے لنکس
+  </div>
+
+  <script>
+    // 🔹 Ad Links
     const adLinks = [
       "https://www.revenuecpmgate.com/b7gn1rctv?key=a6df49ee2755a88078fad4af6ebd06bf",
       "https://www.revenuecpmgate.com/ht895npk?key=1dfeb60a3b20c38bc592436e3ccf9a82",
       "https://www.revenuecpmgate.com/dqm7ya0myx?key=976aa4962ea641f87639dfc784b35969",
       "https://www.revenuecpmgate.com/zq5rzngg?key=a6fd58330a330c83ef94c1f7b6534856"
     ];
-
     const randomAd = adLinks[Math.floor(Math.random() * adLinks.length)];
     const adFrame = document.getElementById('adFrame');
     const adOverlay = document.getElementById('adOverlay');
     const timerEl = document.getElementById('timer');
     const skipBtn = document.getElementById('skipBtn');
 
-    let timeLeft =15;
+    let timeLeft = 15;
     adFrame.src = randomAd;
 
     const countdown = setInterval(() => {
@@ -224,6 +217,7 @@
       adOverlay.style.display = 'none';
     });
 
+    // 🔹 Video Player
     const player = document.getElementById('player');
     const playerVideo = document.getElementById('playerVideo');
 
@@ -239,27 +233,132 @@
       player.style.display = 'none';
     }
 
-    function filterCategory(cat) {
-      document.querySelectorAll('nav button').forEach(btn => btn.classList.remove('active'));
-      event.target.classList.add('active');
-      document.querySelectorAll('.gallery .card').forEach(card => {
-        if (cat === 'all' || card.dataset.category === cat) {
-          card.style.display = 'flex';
-        } else {
-          card.style.display = 'none';
-        }
-      });
+    // 🔹 Pagination + Category
+    let currentPage = 1;
+    const itemsPerPage = 10;
+    const gallery = document.getElementById('videoGallery');
+    let filteredVideos = [];
+
+    const videos = [
+      {src:"https://datavideo.sfo3.cdn.digitaloceanspaces.com/Boys%20Video/VID-20240525-WA0429.mp4",cat:"boys"},
+      {src:"https://datavideo.sfo3.cdn.digitaloceanspaces.com/Boys%20Video/2024-01-07%2011.50.22.mov",cat:"girls"},
+      {src:"https://datavideo.sfo3.cdn.digitaloceanspaces.com/Boys%20Video/2024-01-11%2017.21.12.mov",cat:"girls"},
+    {src:"https://datavideo.sfo3.cdn.digitaloceanspaces.com/Boys%20Video/1_4996958702436090459.mp4",cat:"girls"},
+    {src:"https://datavideo.sfo3.cdn.digitaloceanspaces.com/Boys%20Video/1_5044564283153711537.mp4",cat:"boys"},
+    {src:"https://datavideo.sfo3.cdn.digitaloceanspaces.com/Boys%20Video/2024-01-07%2011.50.22.mov",cat:"boys"},
+    {src:"https://datavideo.sfo3.cdn.digitaloceanspaces.com/Boys%20Video/2024-01-07%2011.50.23.mov",cat:"boys"},
+    {src:"https://datavideo.sfo3.cdn.digitaloceanspaces.com/Boys%20Video/2024-01-07%2011.50.24.mov",cat:"boys"},
+    {src:"https://datavideo.sfo3.cdn.digitaloceanspaces.com/Boys%20Video/2024-01-07%2011.50.25.mov",cat:"boys"},
+    {src:"https://datavideo.sfo3.cdn.digitaloceanspaces.com/Boys%20Video/2024-01-07%2011.51.06.mov",cat:"boys"},
+    {src:"https://datavideo.sfo3.cdn.digitaloceanspaces.com/Boys%20Video/2024-01-07%2011.51.08.mov",cat:"boys"},
+    {src:"https://datavideo.sfo3.cdn.digitaloceanspaces.com/Boys%20Video/2024-01-07%2011.51.10_1.mov",cat:"boys"},
+    {src:"https://datavideo.sfo3.cdn.digitaloceanspaces.com/Boys%20Video/2024-01-07%2011.51.28.mov",cat:"boys"},
+    {src:"https://datavideo.sfo3.cdn.digitaloceanspaces.com/Boys%20Video/2024-01-07%2011.51.29.mov",cat:"boys"},
+    {src:"https://datavideo.sfo3.cdn.digitaloceanspaces.com/Boys%20Video/2024-01-07%2011.51.34_1.mov",cat:"boys"},
+    {src:"https://datavideo.sfo3.cdn.digitaloceanspaces.com/Boys%20Video/2024-01-07%2011.51.36_1.mov",cat:"boys"},
+    {src:"https://datavideo.sfo3.cdn.digitaloceanspaces.com/Boys%20Video/2024-01-07%2011.51.37_1.mov",cat:"boys"},
+    {src:"https://datavideo.sfo3.cdn.digitaloceanspaces.com/Boys%20Video/2024-01-07%2011.51.42.mov",cat:"boys"},
+    {src:"https://datavideo.sfo3.cdn.digitaloceanspaces.com/Boys%20Video/2024-01-07%2011.51.46.mov",cat:"boys"},
+    {src:"https://datavideo.sfo3.cdn.digitaloceanspaces.com/Boys%20Video/2024-01-07%2011.51.51_2.mov",cat:"boys"},
+    {src:"https://datavideo.sfo3.cdn.digitaloceanspaces.com/Boys%20Video/2024-01-07%2011.51.55.mov",cat:"boys"},
+    {src:"https://datavideo.sfo3.cdn.digitaloceanspaces.com/Boys%20Video/2024-01-07%2011.52.05%20(1).mov",cat:"boys"},
+    {src:"https://datavideo.sfo3.cdn.digitaloceanspaces.com/Boys%20Video/2024-01-07%2011.52.06.mov",cat:"boys"},
+    {src:"https://datavideo.sfo3.cdn.digitaloceanspaces.com/Boys%20Video/2024-01-07%2011.52.18.mov",cat:"boys"},
+    {src:"https://datavideo.sfo3.cdn.digitaloceanspaces.com/Boys%20Video/2024-01-07%2011.52.31.mov",cat:"boys"},
+    {src:"https://datavideo.sfo3.cdn.digitaloceanspaces.com/Boys%20Video/2024-01-07%2011.53.13.mov",cat:"boys"},
+    {src:"https://datavideo.sfo3.cdn.digitaloceanspaces.com/Boys%20Video/2024-01-07%2011.53.24_1.mov",cat:"boys"},
+    {src:"https://datavideo.sfo3.cdn.digitaloceanspaces.com/Boys%20Video/2024-01-07%2011.53.26%20(1).mov",cat:"boys"},
+    {src:"https://datavideo.sfo3.cdn.digitaloceanspaces.com/Boys%20Video/2024-01-07%2011.54.10.mov",cat:"boys"},
+    {src:"https://datavideo.sfo3.cdn.digitaloceanspaces.com/Boys%20Video/2024-01-07%2011.54.11.mov",cat:"boys"},
+    {src:"https://datavideo.sfo3.cdn.digitaloceanspaces.com/Boys%20Video/2024-01-07%2011.54.51.mov",cat:"boys"},
+    {src:"https://datavideo.sfo3.cdn.digitaloceanspaces.com/Boys%20Video/2024-01-07%2011.55.00.mov",cat:"boys"},
+    {src:"https://datavideo.sfo3.cdn.digitaloceanspaces.com/Boys%20Video/2024-01-07%2011.55.02.mov",cat:"boys"},
+    {src:"https://datavideo.sfo3.cdn.digitaloceanspaces.com/Boys%20Video/2024-01-07%2011.55.05.mov",cat:"boys"},
+    {src:"https://datavideo.sfo3.cdn.digitaloceanspaces.com/Boys%20Video/2024-01-07%2011.55.10.mov",cat:"boys"},
+    {src:"https://datavideo.sfo3.cdn.digitaloceanspaces.com/Boys%20Video/2024-01-07%2011.55.14.mov",cat:"boys"},
+    {src:"https://datavideo.sfo3.cdn.digitaloceanspaces.com/Boys%20Video/2024-01-07%2011.55.16.mov",cat:"boys"},
+    {src:"https://datavideo.sfo3.cdn.digitaloceanspaces.com/Boys%20Video/2024-01-07%2011.55.17_1.mov",cat:"boys"},
+    {src:"https://datavideo.sfo3.cdn.digitaloceanspaces.com/Boys%20Video/2024-01-07%2011.55.40.mov",cat:"boys"},
+    {src:"https://datavideo.sfo3.cdn.digitaloceanspaces.com/Boys%20Video/2024-01-07%2011.55.43.mov",cat:"boys"},
+    {src:"https://datavideo.sfo3.cdn.digitaloceanspaces.com/Boys%20Video/2024-01-07%2011.55.49.mov",cat:"boys"},
+    {src:"https://datavideo.sfo3.cdn.digitaloceanspaces.com/Boys%20Video/2024-01-07%2011.55.49_2.mov",cat:"boys"},
+    {src:"https://datavideo.sfo3.cdn.digitaloceanspaces.com/Boys%20Video/2024-01-07%2011.55.51_2.mov",cat:"boys"},
+    {src:"https://datavideo.sfo3.cdn.digitaloceanspaces.com/Boys%20Video/2024-01-07%2011.56.00.mov",cat:"boys"},
+    {src:"https://datavideo.sfo3.cdn.digitaloceanspaces.com/Boys%20Video/2024-01-07%2011.56.27%20(1).mov",cat:"boys"},
+    {src:"https://datavideo.sfo3.cdn.digitaloceanspaces.com/Boys%20Video/2024-01-07%2011.56.53_1.mov",cat:"boys"},
+    {src:"https://datavideo.sfo3.cdn.digitaloceanspaces.com/Boys%20Video/2024-01-07%2011.56.56.mov",cat:"boys"},
+    {src:"https://datavideo.sfo3.cdn.digitaloceanspaces.com/Boys%20Video/2024-01-07%2011.57.05.mov",cat:"boys"},
+    {src:"https://datavideo.sfo3.cdn.digitaloceanspaces.com/Boys%20Video/2024-01-07%2011.57.21_1.mov",cat:"boys"},
+    {src:"https://datavideo.sfo3.cdn.digitaloceanspaces.com/Boys%20Video/2024-01-07%2011.57.23_2.mov",cat:"boys"},
+    {src:"https://datavideo.sfo3.cdn.digitaloceanspaces.com/Boys%20Video/2024-01-07%2011.57.26.mov",cat:"boys"},
+    {src:"https://datavideo.sfo3.cdn.digitaloceanspaces.com/Boys%20Video/2024-01-07%2011.57.30.mov",cat:"boys"},
+    {src:"https://datavideo.sfo3.cdn.digitaloceanspaces.com/Boys%20Video/2024-01-07%2011.57.38.mov",cat:"boys"},
+    {src:"https://datavideo.sfo3.cdn.digitaloceanspaces.com/Boys%20Video/2024-01-07%2011.58.51.mov",cat:"boys"},
+    {src:"https://datavideo.sfo3.cdn.digitaloceanspaces.com/Boys%20Video/2024-01-10%2013.08.50%20(1).mov",cat:"boys"},
+    {src:"https://datavideo.sfo3.cdn.digitaloceanspaces.com/Boys%20Video/2024-01-10%2013.08.51.mov",cat:"boys"},
+    {src:"https://datavideo.sfo3.cdn.digitaloceanspaces.com/Boys%20Video/2024-01-10%2013.08.55.mov",cat:"boys"},
+    {src:"https://datavideo.sfo3.cdn.digitaloceanspaces.com/Boys%20Video/2024-01-10%2013.08.56_1.mov",cat:"boys"},
+    {src:"https://datavideo.sfo3.cdn.digitaloceanspaces.com/Boys%20Video/2024-01-10%2018.12.32.mov",cat:"boys"},
+    {src:"https://datavideo.sfo3.cdn.digitaloceanspaces.com/Boys%20Video/2024-01-10%2018.12.32_1.mov",cat:"boys"},
+    {src:"https://datavideo.sfo3.cdn.digitaloceanspaces.com/Boys%20Video/2024-01-10%2018.12.33.mov",cat:"boys"},
+    {src:"https://datavideo.sfo3.cdn.digitaloceanspaces.com/Boys%20Video/2024-01-10%2018.12.34.mov",cat:"boys"},
+    {src:"https://datavideo.sfo3.cdn.digitaloceanspaces.com/Boys%20Video/2024-01-10%2018.12.34_1.mov",cat:"boys"},
+    {src:"https://datavideo.sfo3.cdn.digitaloceanspaces.com/Boys%20Video/2024-01-10%2018.12.35_1.mov",cat:"boys"},
+    {src:"https://datavideo.sfo3.cdn.digitaloceanspaces.com/Boys%20Video/2024-01-10%2018.12.47.mov",cat:"boys"},
+    {src:"https://datavideo.sfo3.cdn.digitaloceanspaces.com/Boys%20Video/2024-01-10%2018.13.49.mov",cat:"boys"},
+    {src:"https://datavideo.sfo3.cdn.digitaloceanspaces.com/Boys%20Video/2024-01-10%2018.13.56.mov",cat:"boys"},
+    {src:"https://datavideo.sfo3.cdn.digitaloceanspaces.com/Boys%20Video/2024-01-11%2017.21.04.mov",cat:"boys"},
+    {src:"https://datavideo.sfo3.cdn.digitaloceanspaces.com/Boys%20Video/2024-01-11%2017.21.04_1.mov",cat:"boys"},
+    {src:"https://datavideo.sfo3.cdn.digitaloceanspaces.com/Boys%20Video/2024-01-11%2017.21.08.mov",cat:"boys"},
+    {src:"https://datavideo.sfo3.cdn.digitaloceanspaces.com/Boys%20Video/2024-01-11%2017.21.09.mov",cat:"boys"},
+    {src:"https://datavideo.sfo3.cdn.digitaloceanspaces.com/Boys%20Video/2024-01-11%2017.21.12.mov",cat:"boys"},
+    ];
+
+    function filterCategory(cat, btn) {
+      document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+
+      if (cat === 'all') {
+        filteredVideos = [...videos];
+      } else {
+        filteredVideos = videos.filter(v => v.cat === cat);
+      }
+
+      currentPage = 1;
+      renderPage();
+      closePlayer();
     }
 
-    playerVideo.addEventListener('play', () => {
-      document.querySelectorAll('.gallery video').forEach(v => v.pause());
-    });
+    function renderPage() {
+      gallery.innerHTML = '';
+      const start = (currentPage - 1) * itemsPerPage;
+      const end = start + itemsPerPage;
+      const pageItems = filteredVideos.slice(start, end);
 
-    let currentPage = 1;
-    const itemsPerPage = 50;
+      pageItems.forEach(v => {
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.dataset.category = v.cat;
+        card.innerHTML = `
+          <div class="thumb" onclick="openPlayer('${v.src}')">
+            <video src="${v.src}#t=1" muted></video>
+          </div>
+        `;
+        gallery.appendChild(card);
+      });
+
+      document.getElementById('prevBtn').disabled = currentPage === 1;
+      document.getElementById('nextBtn').disabled = end >= filteredVideos.length;
+    }
+
     function changePage(step) {
       currentPage += step;
-      alert("Page changed: " + currentPage);
+      renderPage();
     }
-  </script></body>
+
+    // default load
+    filteredVideos = [...videos];
+    renderPage();
+  </script>
+</body>
 </html>
