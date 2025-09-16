@@ -116,48 +116,10 @@
       background: #475569;
       cursor: not-allowed;
     }
-    /* Ad Overlay */
-    #adOverlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.9);
-      color: #fff;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      flex-direction: column;
-      z-index: 5000;
-    }
-    #skipBtn {
-      margin-top: 20px;
-      padding: 10px 20px;
-      background: #2563eb;
-      border: none;
-      border-radius: 6px;
-      color: #fff;
-      font-weight: bold;
-      cursor: pointer;
-      display: none;
-    }
-    #timer {
-      position: absolute;
-      top: 20px;
-      right: 20px;
-      font-size: 18px;
-      font-weight: bold;
-      background: rgba(0,0,0,0.6);
-      padding: 6px 12px;
-      border-radius: 6px;
-    }
+    
   </style>
 </head>
 <body>
-  <!-- Ad Overlay -->
-  <div id="adOverlay">
-    <div id="timer">15</div>
-    <iframe id="adFrame" src="" style="width:80%;height:60%;border:none;border-radius:8px;"></iframe>
-    <button id="skipBtn">Skip Ad</button>
-  </div>
 
   <header>
     <h1>📺 Data 2025</h1>
@@ -182,39 +144,7 @@
   </div>
 
   <script>
-    // 🔹 Ad Links
-    const adLinks = [
-      "https://www.revenuecpmgate.com/b7gn1rctv?key=a6df49ee2755a88078fad4af6ebd06bf",
-      "https://www.revenuecpmgate.com/ht895npk?key=1dfeb60a3b20c38bc592436e3ccf9a82",
-      "https://www.revenuecpmgate.com/dqm7ya0myx?key=976aa4962ea641f87639dfc784b35969",
-      "https://www.revenuecpmgate.com/zq5rzngg?key=a6fd58330a330c83ef94c1f7b6534856"
-    ];
-    const randomAd = adLinks[Math.floor(Math.random() * adLinks.length)];
-    const adFrame = document.getElementById('adFrame');
-    const adOverlay = document.getElementById('adOverlay');
-    const timerEl = document.getElementById('timer');
-    const skipBtn = document.getElementById('skipBtn');
-
-    let timeLeft = 15;
-    adFrame.src = randomAd;
-
-    const countdown = setInterval(() => {
-      timeLeft--;
-      timerEl.textContent = timeLeft;
-      if (timeLeft <= 3) {
-        skipBtn.style.display = 'block';
-      }
-      if (timeLeft <= 0) {
-        clearInterval(countdown);
-        adOverlay.style.display = 'none';
-      }
-    }, 1000);
-
-    skipBtn.addEventListener('click', () => {
-      clearInterval(countdown);
-      adOverlay.style.display = 'none';
-    });
-
+    
     // 🔹 Video Player
     const player = document.getElementById('player');
     const playerVideo = document.getElementById('playerVideo');
